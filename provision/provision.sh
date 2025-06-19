@@ -10,7 +10,7 @@ GITHUB_REPO="light-box"
 BRANCH="main"
 
 # Derived URL for raw file access
-GITHUB_RAW_URL="https://raw.githubusercontent.com/$GITHUB_USER/$GITHUB_REPO/$BRANCH"
+GITHUB_RAW_URL="https://raw.githubusercontent.com/$GITHUB_USER/$GITHUB_REPO/refs/heads/$BRANCH"
 
 # installer scripts
 INSTALL_REMOTE_SCRIPT_URL="$GITHUB_RAW_URL/provision/install/install-remote-script.sh"
