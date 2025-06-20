@@ -23,7 +23,7 @@ fi
 # --- SCRIPT LOGIC ---
 REMOTE_URL="$1"
 # Extract the filename from the URL (e.g., http://.../setup-wifi.sh -> setup-wifi.sh)
-SCRIPT_NAME=$(basename "$REMOTE_URL")
+SCRIPT_NAME=${$(basename "$REMOTE_URL")%%\?*}
 DEST_PATH="/usr/local/bin/$SCRIPT_NAME"
 
 echo "--- Installing Remote Script ---"
