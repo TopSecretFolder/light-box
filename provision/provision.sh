@@ -16,9 +16,10 @@ GITHUB_RAW_URL="https://raw.githubusercontent.com/$GITHUB_USER/$GITHUB_REPO/refs
 INSTALL_REMOTE_SCRIPT_URL="$GITHUB_RAW_URL/provision/install/install-remote-script.sh"
 INSTALL_REMOTE_SERVICE_URL="$GITHUB_RAW_URL/provision/install/install-remote-service.sh"
 
+CB=$((RANDOM % 1000 + 1))
 # Wifi service scripts
-WIFI_REMOTE_SCRIPT_URL="$GITHUB_RAW_URL/provision/wifi/setup-wifi.sh"
-WIFI_REMOTE_SERVICE_URL="$GITHUB_RAW_URL/provision/wifi/setup-wifi.service"
+WIFI_REMOTE_SCRIPT_URL="$GITHUB_RAW_URL/provision/wifi/setup-wifi.sh?cb=$CB"
+WIFI_REMOTE_SERVICE_URL="$GITHUB_RAW_URL/provision/wifi/setup-wifi.service?cb=$CB"
 
 # install the wifi script and service
 curl -sSL $INSTALL_REMOTE_SCRIPT_URL | sudo bash -s $WIFI_REMOTE_SCRIPT_URL
