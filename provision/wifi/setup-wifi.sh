@@ -55,9 +55,11 @@ EOF
 
 echo "Successfully wrote new configuration to $WPA_CONFIG_FILE"
 
-# 7. Reconfigure the wlan0 interface to apply the new settings immediately
-echo "Reloading wlan0 interface..."
-wpa_cli -i wlan0 reconfigure
+# 7. Restart the wlan0 interface to apply the new settings.
+# This is more reliable than 'wpa_cli reconfigure'.
+echo "Restarting wlan0 interface to apply new settings..."
+ifdown wlan0 || true
+ifup wlan0 || true
 
 echo "Wi-Fi setup script finished."
 
