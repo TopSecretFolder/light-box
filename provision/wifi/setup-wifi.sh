@@ -28,15 +28,17 @@ fi
 
 echo "Credentials read successfully for SSID: $SSID"
 
-# 4. Use nmcli to manage the connection
-# First, check if a connection with this SSID already exists.
-# We grep for the SSID and ensure it's a Wi-Fi connection.
-EXISTING_CONNECTION=$(nmcli -g NAME,TYPE connection show | grep ":802-11-wireless$" | grep "^${SSID}:" | cut -d':' -f1)
-
-if [ -n "$EXISTING_CONNECTION" ]; then
-    echo "Found existing connection profile: '$EXISTING_CONNECTION'. Deleting it to ensure a fresh connection."
-    nmcli connection delete "$EXISTING_CONNECTION"
-fi
+# 4. To ensure a clean slate, delete ALL existing Wi-Fi profiles.
+# This is simpler and more robust than trying to match a specific profile.
+echo "Searching for and deleting all existing Wi-Fi connection profiles..."
+# The output of the nmcli command is redirected to a while loop.
+# This is safer for names that might contain spaces.
+nmcli -g NAME,TYPE c show | grep ':802-11-wireless$' | cut -d':' -f1 | while read -r conn_name; do
+    if [ -n "$conn_name" ]; then
+        echo "Deleting profile: '$conn_name'"
+        nmcli connection delete "$conn_name"
+    fi
+done
 
 # 5. Create a new connection and activate it.
 # This single command creates the profile, saves it, and connects.
