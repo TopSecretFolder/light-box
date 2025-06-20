@@ -22,7 +22,7 @@ fi
 
 # --- SCRIPT LOGIC ---
 REMOTE_URL="$1"
-SERVICE_NAME=$(basename "$REMOTE_URL")
+SERVICE_NAME=${$(basename "$REMOTE_URL")%%\?*}
 DEST_PATH="/etc/systemd/system/$SERVICE_NAME"
 
 echo "--- Installing Remote Service ---"
