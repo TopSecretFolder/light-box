@@ -1,11 +1,11 @@
 [Unit]
 Description=Configure Wi-Fi from /boot/wifi_credentials.txt
-# This service should run after the basic network services are up,
-# but before the main network target is reached.
+# Run AFTER the NetworkManager daemon itself has started.
+After=NetworkManager.service
 
-After=network-pre.target
-Before=network.target
-Wants=wpa_supplicant.service
+# This service is required by NetworkManager, and must run before the network is considered "online".
+Requires=NetworkManager.service
+Before=network-online.target
 
 [Service]
 Type=oneshot
@@ -13,5 +13,6 @@ ExecStart=/usr/local/bin/setup-wifi.sh
 RemainAfterExit=yes
 
 [Install]
-WantedBy=multi-user.target
+# This ensures your service is started whenever NetworkManager is started.
+WantedBy=NetworkManager.service
 
