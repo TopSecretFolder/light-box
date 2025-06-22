@@ -42,4 +42,15 @@ echo "   sudo reboot"
 echo ""
 
 # install docker
+echo "docker install script..."
 curl -fsSL https://get.docker.com | sudo bash
+
+# add docker group stuff
+echo "add docker group"
+sudo groupadd docker
+sudo usermod -aG docker $USER
+
+# run on boot
+echo "start docker and containerd service on boot"
+sudo systemctl enable docker.service
+sudo systemctl enable containerd.service
