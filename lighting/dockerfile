@@ -1,6 +1,6 @@
 # Stage 1: The builder stage
-# This stage uses the official Go image to build the application.
-FROM golang:latest AS builder
+# We use a Go image based on Debian Buster to ensure GLIBC compatibility with the final image.
+FROM golang:1.22-buster AS builder
 
 # Install the C cross-compiler for the ARMv7 architecture.
 # This is required because we are enabling CGO to link against C libraries.
@@ -28,13 +28,9 @@ RUN CGO_ENABLED=1 GOOS=linux GOARCH=arm GOARM=7 go build -v -o /main .
 # ---
 
 # Stage 2: The final stage
-# We can't use 'scratch' anymore because the binary is dynamically linked to C libraries.
-# We use a slim Debian image for the ARMv7 architecture.
-
-# Declare the build argument for the target platform.
+# We use a slim Debian Buster image for the ARMv7 architecture.
+# This now matches the base of our builder image.
 ARG TARGETPLATFORM
-
-# Use the TARGETPLATFORM build argument. This resolves the linting error.
 FROM --platform=${TARGETPLATFORM} arm32v7/debian:buster-slim
 
 # Copy the built binary from the 'builder' stage
