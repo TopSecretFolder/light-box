@@ -15,5 +15,5 @@ docker run \
   --volume /var/run/docker.sock:/var/run/docker.sock \
   containrrr/watchtower \
   --cleanup \
-  --interval 86400 \
-  $IMAGE
+  --interval 5 \
+  light-box
