@@ -4,7 +4,7 @@ docker pull $IMAGE
 
 docker stop light-box
 docker rm light-box
-docker run --detach --restart always --name light-box -p 80:80 $IMAGE
+docker run --priviledged --detach --restart always --name light-box -p 80:80 $IMAGE
 
 docker stop watchtower
 docker rm watchtower
