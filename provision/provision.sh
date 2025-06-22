@@ -54,3 +54,7 @@ sudo usermod -aG docker $USER
 echo "start docker and containerd service on boot"
 sudo systemctl enable docker.service
 sudo systemctl enable containerd.service
+
+
+# reboot to make things work
+sudo reboot
