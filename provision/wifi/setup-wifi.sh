@@ -8,7 +8,7 @@ set -e # Exit immediately if a command exits with a non-zero status.
 
 echo "Starting NetworkManager Wi-Fi setup script..."
 
-CREDS_FILE="/boot/wifi_credentials.txt"
+CREDS_FILE="/boot/firmware/wifi_credentials.txt"
 
 # 1. Check if the credentials file exists
 if [ ! -f "$CREDS_FILE" ]; then
