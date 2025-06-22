@@ -8,7 +8,7 @@ import (
 func main() {
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Light Box Server UPDATEDDD")
+		return c.String(http.StatusOK, "Light Box Server UPDATEDDD AGAIN")
 	})
 	e.Logger.Fatal(e.Start(":80"))
 }
