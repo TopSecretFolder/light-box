@@ -1,11 +1,6 @@
 [Unit]
 Description=Configure Wi-Fi from /boot/wifi_credentials.txt
-# Run AFTER the NetworkManager daemon itself has started.
-After=NetworkManager.service
-
-# This service is required by NetworkManager, and must run before the network is considered "online".
-Requires=NetworkManager.service
-Before=network-online.target
+After=multi-user.target
 
 [Service]
 Type=oneshot
@@ -13,6 +8,6 @@ ExecStart=/usr/local/bin/setup-wifi.sh
 RemainAfterExit=yes
 
 [Install]
-# This ensures your service is started whenever NetworkManager is started.
-WantedBy=NetworkManager.service
+# This hooks the service into the multi-user boot process.
+WantedBy=multi-user.target
 
