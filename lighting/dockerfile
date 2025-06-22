@@ -1,0 +1,49 @@
+# Stage 1: The builder stage
+# This stage uses the official Go image to build the application.
+FROM golang:latest AS builder
+
+# Install the C cross-compiler for the ARMv7 architecture.
+# This is required because we are enabling CGO to link against C libraries.
+RUN apt-get update && apt-get install -y gcc-arm-linux-gnueabihf
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy go.mod and go.sum files to download dependencies
+COPY go.mod go.sum ./
+
+# Download the Go modules
+RUN go mod download
+
+# Copy the rest of the source code into the container
+# This assumes your Go source files are in the same directory as the Dockerfile
+COPY *.go ./
+
+# Build the Go app for Raspberry Pi Zero 2 (ARMv7) with CGO enabled.
+# We must set CGO_ENABLED=1 and specify the C cross-compiler (CC).
+# GOOS=linux, GOARCH=arm, and GOARM=7 target the Pi Zero 2.
+ENV CC=arm-linux-gnueabihf-gcc
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=arm GOARM=7 go build -v -o /main .
+
+# ---
+
+# Stage 2: The final stage
+# We can't use 'scratch' anymore because the binary is dynamically linked to C libraries.
+# We use a slim Debian image for the ARMv7 architecture.
+
+# Declare the build argument for the target platform.
+ARG TARGETPLATFORM
+
+# Use the TARGETPLATFORM build argument. This resolves the linting error.
+FROM --platform=${TARGETPLATFORM} arm32v7/debian:buster-slim
+
+# Copy the built binary from the 'builder' stage
+COPY --from=builder /main /
+
+# Expose port 8080 to the outside world.
+# Change this to the port your application listens on.
+EXPOSE 8080
+
+# The command to run when the container starts.
+# This executes the binary we built.
+CMD ["/main"]
