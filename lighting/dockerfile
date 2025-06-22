@@ -1,45 +1,80 @@
-# Stage 1: The builder stage
-# We use a Go image based on Debian Buster to ensure GLIBC compatibility with the final image.
-FROM golang:1.22-buster AS builder
-
-# Install the C cross-compiler for the ARMv7 architecture.
-# This is required because we are enabling CGO to link against C libraries.
-RUN apt-get update && apt-get install -y gcc-arm-linux-gnueabihf
+# =====================================================================
+# Builder Stage
+#
+# This stage compiles the Go application. It uses a full Go development
+# image to have all the necessary tools.
+# =====================================================================
+# Using arm64v8 base image for better compatibility on RPi Zero 2 W (64-bit)
+FROM --platform=linux/arm64 golang:1.24-bookworm AS builder
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy go.mod and go.sum files to download dependencies
+# Install C libraries and tools required for CGO and GPIO/SPI libraries.
+# Libraries like rpi-ws281x-go require these to build the underlying C components.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    scons \
+    cmake \
+    swig \
+    # Add any other specific C dependency development packages here
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy the go.mod and go.sum files to leverage Docker's build cache
 COPY go.mod go.sum ./
 
-# Download the Go modules
+# Download the Go module dependencies
 RUN go mod download
 
-# Copy the rest of the source code into the container
-# This assumes your Go source files are in the same directory as the Dockerfile
-COPY *.go ./
+# Copy the rest of the application's source code
+COPY . .
 
-# Build the Go app for Raspberry Pi Zero 2 (ARMv7) with CGO enabled.
-# We must set CGO_ENABLED=1 and specify the C cross-compiler (CC).
-# GOOS=linux, GOARCH=arm, and GOARM=7 target the Pi Zero 2.
-ENV CC=arm-linux-gnueabihf-gcc
-RUN CGO_ENABLED=1 GOOS=linux GOARCH=arm GOARM=7 go build -v -o /main .
+# Compile the application for the Raspberry Pi Zero 2 W (64-bit).
+# GOARCH=arm64 is for the 64-bit ARMv8 architecture.
+# CGO_ENABLED=1 is crucial for building with C dependencies.
+RUN GOOS=linux GOARCH=arm64 CGO_ENABLED=1 go build -v -o myapp .
 
-# ---
+# =====================================================================
+# Runtime Stage
+#
+# This stage creates the final, lightweight image. It copies the
+# compiled application and any necessary runtime dependencies.
+# =====================================================================
+FROM --platform=linux/arm64 debian:bookworm-slim
 
-# Stage 2: The final stage
-# We use a slim Debian Buster image for the ARMv7 architecture.
-# This now matches the base of our builder image.
-ARG TARGETPLATFORM
-FROM --platform=${TARGETPLATFORM} arm32v7/debian:buster-slim
+# Set the working directory
+WORKDIR /app
 
-# Copy the built binary from the 'builder' stage
-COPY --from=builder /main /
+# Install only the necessary runtime C libraries.
+# For many GPIO libraries, the C code is statically linked during the build,
+# so you may not need to add many packages here.
+# ca-certificates is good practice for any network requests.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
-# Expose port 8080 to the outside world.
-# Change this to the port your application listens on.
-EXPOSE 8080
+# Copy the compiled application from the builder stage
+COPY --from=builder /app/myapp .
 
-# The command to run when the container starts.
-# This executes the binary we built.
-CMD ["/main"]
+# Set the command to run when the container starts
+ENTRYPOINT ["./myapp"]
+
+# =====================================================================
+# HOW TO RUN THIS CONTAINER
+#
+# To control GPIO/SPI, the container needs access to the host's hardware.
+# You must run the container with elevated privileges.
+#
+# Option 1: Privileged Mode (Easiest)
+# This gives the container full access to all host devices.
+#
+#   docker run --privileged -d your-image-name
+#
+# Option 2: Mapping Specific Devices (More Secure)
+# This only grants access to the necessary device files for GPIO and SPI.
+#
+#   docker run --device=/dev/gpiomem --device=/dev/spidev0.0 -d your-image-name
+#
+# Note: The device name `/dev/spidev0.0` might vary. Check the `/dev`
+# directory on your Raspberry Pi.
+# =====================================================================
