@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Script to configure Wi-Fi using NetworkManager (nmcli) from a file in /boot.
-# This is the modern method for recent Raspberry Pi OS versions.
+# Modified for robustness when run as a systemd service.
 #
 
 set -e # Exit immediately if a command exits with a non-zero status.
@@ -28,11 +28,20 @@ fi
 
 echo "Credentials read successfully for SSID: $SSID"
 
+# ==================== NEW: WAIT AND RESCAN SECTION ====================
+# Give the Wi-Fi adapter a few seconds to power on and initialize.
+echo "Waiting 5 seconds for the Wi-Fi hardware to initialize..."
+sleep 5
+
+# Explicitly tell NetworkManager to perform a new Wi-Fi scan.
+echo "Forcing a new Wi-Fi scan..."
+# The 'nmcli device wifi rescan' command tells NetworkManager to look for networks right now.
+nmcli device wifi rescan
+echo "Scan complete."
+# ======================================================================
+
 # 4. To ensure a clean slate, delete ALL existing Wi-Fi profiles.
-# This is simpler and more robust than trying to match a specific profile.
 echo "Searching for and deleting all existing Wi-Fi connection profiles..."
-# The output of the nmcli command is redirected to a while loop.
-# This is safer for names that might contain spaces.
 nmcli -g NAME,TYPE c show | grep ':802-11-wireless$' | cut -d':' -f1 | while read -r conn_name; do
     if [ -n "$conn_name" ]; then
         echo "Deleting profile: '$conn_name'"
@@ -41,13 +50,32 @@ nmcli -g NAME,TYPE c show | grep ':802-11-wireless$' | cut -d':' -f1 | while rea
 done
 
 # 5. Create a new connection and activate it.
-# This single command creates the profile, saves it, and connects.
-# The 'ifname wlan0' argument makes it specific to the Wi-Fi interface.
+# This loop will now retry the connection up to 4 times.
 echo "Attempting to create and connect to new Wi-Fi network '$SSID'..."
-nmcli device wifi connect "$SSID" password "$PSK" ifname wlan0
+for i in {1..4}; do
+    # Use 'set +e' to temporarily disable exit-on-error for the connection attempt
+    set +e
+    nmcli device wifi connect "$SSID" password "$PSK" ifname wlan0
+    
+    # Check the exit code of the last command. 0 means success.
+    if [ $? -eq 0 ]; then
+        # Re-enable exit-on-error
+        set -e
+        echo "Successfully connected to '$SSID'."
+        echo "Wi-Fi setup script finished."
+        exit 0 # Exit the script successfully
+    fi
+    # Re-enable exit-on-error
+    set -e
 
-# nmcli will return a non-zero exit code on failure, which 'set -e' will catch.
-echo "Successfully connected to '$SSID'."
+    # If it failed, wait before retrying
+    if [ $i -lt 4 ]; then
+      echo "Connection failed (Attempt $i). Retrying in 5 seconds..."
+      sleep 5
+      # Also rescan before the next attempt
+      nmcli device wifi rescan
+    fi
+done
 
-echo "Wi-Fi setup script finished."
-exit 0
+echo "Could not connect to the network after several attempts. Aborting."
+exit 1 # Exit the script with an error status
