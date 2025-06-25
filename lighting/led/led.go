@@ -1,4 +1,4 @@
-package strip
+package led
 
 import (
 	"fmt"
@@ -114,8 +114,16 @@ func (s *SK9822) Clear() {
 func (s *SK9822) Close() {
 	log.Println("Closing SPI port and turning off LEDs.")
 	s.Clear()
-	s.Render()
-	s.port.Close()
+
+	err := s.Render()
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	err = s.port.Close()
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func Blink() {

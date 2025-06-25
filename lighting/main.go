@@ -1,7 +1,7 @@
 package main
 
 import (
-	"light-box/strip"
+	"light-box/led"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -15,7 +15,7 @@ func main() {
 		return c.String(http.StatusOK, "Light Box Server: "+VERSION)
 	})
 
-	go strip.Blink()
+	go led.Blink()
 
 	e.Logger.Fatal(e.Start(":80"))
 }
