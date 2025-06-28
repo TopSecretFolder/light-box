@@ -1,18 +1,28 @@
 package animation
 
-import "math"
+import (
+	"math"
+)
 
 type Curve []Handle
 
 func (c Curve) Sample(head float64) float64 {
-	head = math.Min(head, 1.0)
-	head = math.Max(head, 0.0)
-	index := int(math.Floor(head * float64(len(c))))
+	index := int(math.Floor(head))
 
-	x := head*float64(len(c)) - float64(index)
+	if index >= len(c) {
+		return 0
+	}
 
 	handle := c[index]
-	return handle.Sample(x)
+
+	return handle.Sample(head)
+}
+
+func (c Curve) SampleByte(head float64) byte {
+	y := c.Sample(head)
+
+	return byte(math.Floor(y * 255))
+
 }
 
 type Handle struct {
@@ -23,13 +33,10 @@ type Handle struct {
 }
 
 func (h Handle) Sample(x float64) float64 {
-	x = math.Min(x, 1.0)
-	x = math.Max(x, 0.0)
 	return NewRasterizedBezierSegment(h, 100).Sample(x)
 }
 
 type Animation struct {
-	ID         string `json:"id"`
 	Name       string `json:"name"`
 	Red        Curve  `json:"red"`
 	Green      Curve  `json:"green"`

@@ -2,6 +2,7 @@ package led
 
 import (
 	"fmt"
+	"light-box/animation"
 	"log"
 	"os"
 	"os/signal"
@@ -150,26 +151,24 @@ func Blink() {
 
 	log.Println("Blinking pixel 0. Press Ctrl+C to exit.")
 
+	ani := animation.AnimationPulse()
+
 	// Infinite loop to blink the pixel.
 	for {
-		// --- Turn the pixel ON (Blue) ---
-		log.Println("Pixel ON")
-		// Set the first pixel (index 0) to blue with a moderate brightness (10 out of 31).
-		strip.SetPixel(0, 0, 0, 255, 10)
-		// Send the data to the strip.
-		if err := strip.Render(); err != nil {
-			log.Printf("Failed to render ON state: %v", err)
-		}
-		time.Sleep(time.Second)
+		for i := range 41 {
+			x := float64(i) / 20.0
+			r := ani.Red.SampleByte(x)
+			g := ani.Green.SampleByte(x)
+			b := ani.Blue.SampleByte(x)
+			br := ani.Brightness.SampleByte(x)
 
-		// --- Turn the pixel OFF (Black) ---
-		log.Println("Pixel OFF")
-		// Set the first pixel to black (all zeros).
-		strip.SetPixel(0, 0, 0, 0, 0)
-		// Send the data to the strip.
-		if err := strip.Render(); err != nil {
-			log.Printf("Failed to render OFF state: %v", err)
+			strip.SetPixel(0, r, g, b, br)
+
+			if err := strip.Render(); err != nil {
+				log.Printf("Failed to render OFF state: %v", err)
+			}
+
+			time.Sleep(time.Millisecond * 100)
 		}
-		time.Sleep(time.Second)
 	}
 }
