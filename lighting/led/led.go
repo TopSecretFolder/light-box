@@ -5,9 +5,6 @@ import (
 	"light-box/animation"
 	"log"
 	"math"
-	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
 	"periph.io/x/conn/v3/physic"
@@ -128,30 +125,7 @@ func (s *SK9822) Close() {
 	}
 }
 
-func Loop() {
-	// The number of LEDs in your strip. We only use the first one.
-	const numLEDs = 1
-	// The SPI device path. "/dev/spidev0.0" is standard.
-	const spiPort = "/dev/spidev0.0" // An empty string uses the default SPI bus.
-
-	strip, err := NewSK9822(spiPort, numLEDs)
-	if err != nil {
-		log.Fatalf("Failed to initialize LED strip: %v", err)
-	}
-	// Ensure we clean up resources on exit.
-	defer strip.Close()
-
-	// Set up a channel to listen for OS signals (like Ctrl+C) for a graceful shutdown.
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		<-sigChan
-		strip.Close()
-		os.Exit(0)
-	}()
-
-	log.Println("Blinking pixel 0. Press Ctrl+C to exit.")
-
+func Loop(strip *SK9822) {
 	// Infinite loop to blink the pixel.
 	prevAni := animation.AnimationPulse()
 	for {
@@ -161,9 +135,14 @@ func Loop() {
 		}
 
 		domain := ani.Domain()
-		numIterations := int(math.Floor(domain / float64(ani.Frames)))
+		numIterations := ani.Frames
 		xInterval := domain / float64(ani.Frames)
 		interval := time.Duration(math.Round(ani.DurationSeconds / float64(ani.Frames) * float64(time.Second)))
+
+		log.Println("domain", domain)
+		log.Println("numIterations", numIterations)
+		log.Println("xInterval", xInterval)
+		log.Println("interval", interval)
 
 		for i := range numIterations {
 			x := float64(i) * xInterval
@@ -171,10 +150,14 @@ func Loop() {
 			g := ani.Green.SampleByte(x)
 			b := ani.Blue.SampleByte(x)
 			br := ani.Brightness.SampleByte(x)
+
+			log.Println("x", x, "r", r, "g", g, "b", b, "br", br)
+
 			strip.SetPixel(0, r, g, b, br)
 			if err := strip.Render(); err != nil {
 				log.Printf("Failed to render OFF state: %v", err)
 			}
+
 			time.Sleep(interval)
 		}
 	}

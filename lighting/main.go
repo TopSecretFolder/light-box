@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"light-box/animation"
 	"light-box/led"
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo"
 )
 
-const VERSION = "v1.0.5"
+const VERSION = "v1.0.6"
 
 func main() {
 	e := echo.New()
@@ -27,6 +28,19 @@ func main() {
 		return nil
 	})
 
-	go led.Loop()
+	// The number of LEDs in your strip. We only use the first one.
+	const numLEDs = 1
+	// The SPI device path. "/dev/spidev0.0" is standard.
+	const spiPort = "/dev/spidev0.0" // An empty string uses the default SPI bus.
+
+	strip, err := led.NewSK9822(spiPort, numLEDs)
+	if err != nil {
+		log.Fatalf("Failed to initialize LED strip: %v", err)
+	}
+	// Ensure we clean up resources on exit.
+	defer strip.Close()
+
+	go led.Loop(strip)
+
 	e.Logger.Fatal(e.Start(":80"))
 }
