@@ -32,16 +32,20 @@ func TestCurve_Sample(t *testing.T) {
 			// TODO: construct the receiver type.
 			xs := []float64{}
 			ys := []float64{}
+			bytes := []byte{}
 
 			for i := range 41 {
 				x := float64(i) / 20.0
 				y := tt.c.Sample(x)
+				b := tt.c.SampleByte(x)
 				xs = append(xs, x)
 				ys = append(ys, y)
+				bytes = append(bytes, b)
 			}
 
 			t.Log("xs", xs)
 			t.Log("ys", ys)
+			t.Log("bytes", bytes)
 		})
 	}
 }

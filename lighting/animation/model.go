@@ -25,6 +25,13 @@ func (c Curve) SampleByte(head float64) byte {
 
 }
 
+func (c Curve) Domain() float64 {
+	if len(c) == 0 {
+		return 0
+	}
+	return c[len(c)-1].P3.X - c[0].P0.X
+}
+
 type Handle struct {
 	P0 Point `json:"p0"`
 	P1 Point `json:"p1"`
@@ -37,16 +44,27 @@ func (h Handle) Sample(x float64) float64 {
 }
 
 type Animation struct {
-	Name       string `json:"name"`
-	Red        Curve  `json:"red"`
-	Green      Curve  `json:"green"`
-	Blue       Curve  `json:"blue"`
-	Brightness Curve  `json:"brightness"`
+	Name            string  `json:"name"`
+	Red             Curve   `json:"red"`
+	Green           Curve   `json:"green"`
+	Blue            Curve   `json:"blue"`
+	Brightness      Curve   `json:"brightness"`
+	Frames          int     `json:"frames"`
+	DurationSeconds float64 `json:"duration_seconds"`
+}
+
+func (a Animation) Domain() float64 {
+	rdomain := a.Red.Domain()
+	gdomain := a.Green.Domain()
+	bdomain := a.Blue.Domain()
+	brdomain := a.Brightness.Domain()
+	return math.Max(math.Max(math.Max(rdomain, gdomain), bdomain), brdomain)
 }
 
 // Point represents a 2D point.
 type Point struct {
-	X, Y float64
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
 }
 
 // RasterizedBezier provides a simple, fast, and approximate way to solve for Y given X.

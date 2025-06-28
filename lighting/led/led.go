@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"light-box/animation"
 	"log"
+	"math"
 	"os"
 	"os/signal"
 	"syscall"
@@ -127,7 +128,7 @@ func (s *SK9822) Close() {
 	}
 }
 
-func Blink() {
+func Loop() {
 	// The number of LEDs in your strip. We only use the first one.
 	const numLEDs = 1
 	// The SPI device path. "/dev/spidev0.0" is standard.
@@ -151,24 +152,30 @@ func Blink() {
 
 	log.Println("Blinking pixel 0. Press Ctrl+C to exit.")
 
-	ani := animation.AnimationPulse()
-
 	// Infinite loop to blink the pixel.
+	prevAni := animation.AnimationPulse()
 	for {
-		for i := range 41 {
-			x := float64(i) / 20.0
+		ani, found := animation.GlobalManager.Dequeue()
+		if !found {
+			ani = prevAni
+		}
+
+		domain := ani.Domain()
+		numIterations := int(math.Floor(domain / float64(ani.Frames)))
+		xInterval := domain / float64(ani.Frames)
+		interval := time.Duration(math.Round(ani.DurationSeconds / float64(ani.Frames) * float64(time.Second)))
+
+		for i := range numIterations {
+			x := float64(i) * xInterval
 			r := ani.Red.SampleByte(x)
 			g := ani.Green.SampleByte(x)
 			b := ani.Blue.SampleByte(x)
 			br := ani.Brightness.SampleByte(x)
-
 			strip.SetPixel(0, r, g, b, br)
-
 			if err := strip.Render(); err != nil {
 				log.Printf("Failed to render OFF state: %v", err)
 			}
-
-			time.Sleep(time.Millisecond * 100)
+			time.Sleep(interval)
 		}
 	}
 }

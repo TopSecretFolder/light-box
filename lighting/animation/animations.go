@@ -41,5 +41,7 @@ func AnimationPulse() Animation {
 				P3: Point{X: 2, Y: 0},
 			},
 		},
+		Frames:          120,
+		DurationSeconds: 30,
 	}
 }
