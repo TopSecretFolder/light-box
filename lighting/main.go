@@ -1,11 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"light-box/animation"
 	"light-box/led"
 	"net/http"
 
-	"github.com/chromedp/cdproto/animation"
 	"github.com/labstack/echo"
 )
 
@@ -19,7 +19,10 @@ func main() {
 
 	e.POST("/animation/push", func(ctx echo.Context) error {
 		a := animation.Animation{}
-		ctx.Bind(&a)
+		if err := ctx.Bind(&a); err != nil {
+			return fmt.Errorf("error pushing animation: %w", err)
+		}
+
 		animation.GlobalManager.Enqueue(a)
 		return nil
 	})
