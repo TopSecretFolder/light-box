@@ -139,19 +139,12 @@ func Loop(strip *SK9822) {
 		xInterval := domain / float64(ani.Frames)
 		interval := time.Duration(math.Round(ani.DurationSeconds / float64(ani.Frames) * float64(time.Second)))
 
-		log.Println("domain", domain)
-		log.Println("numIterations", numIterations)
-		log.Println("xInterval", xInterval)
-		log.Println("interval", interval)
-
 		for i := range numIterations {
 			x := float64(i) * xInterval
 			r := ani.Red.SampleByte(x)
 			g := ani.Green.SampleByte(x)
 			b := ani.Blue.SampleByte(x)
 			br := ani.Brightness.SampleByte(x)
-
-			log.Println("x", x, "r", r, "g", g, "b", b, "br", br)
 
 			strip.SetPixel(0, r, g, b, br)
 			if err := strip.Render(); err != nil {
@@ -160,5 +153,7 @@ func Loop(strip *SK9822) {
 
 			time.Sleep(interval)
 		}
+
+		prevAni = ani
 	}
 }
