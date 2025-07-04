@@ -4,7 +4,10 @@ go 1.24.4
 
 require github.com/labstack/echo v3.3.10+incompatible
 
-require github.com/maruel/ansi256 v1.0.2 // indirect
+require (
+	github.com/maruel/ansi256 v1.0.2 // indirect
+	gonum.org/v1/gonum v0.16.0 // indirect
+)
 
 require (
 	github.com/labstack/gommon v0.4.2 // indirect

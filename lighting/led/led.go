@@ -141,16 +141,15 @@ func Loop(strip *SK9822) {
 
 		for i := range numIterations {
 			x := float64(i) * xInterval
-			r := ani.Red.SampleByte(x)
-			g := ani.Green.SampleByte(x)
-			b := ani.Blue.SampleByte(x)
-			br := ani.Brightness.SampleByteMaxValue(x, 32)
-
-			strip.SetPixel(0, r, g, b, br)
-			if err := strip.Render(); err != nil {
-				log.Printf("Failed to render OFF state: %v", err)
+			r, g, b := ani.Sample(x)
+			br := ani.GetBrightness(x)
+			if strip != nil {
+				strip.SetPixel(0, r, g, b, br)
+				if err := strip.Render(); err != nil {
+					log.Printf("Failed to render OFF state: %v", err)
+				}
 			}
-
+			// log.Println("r", r, "g", g, "b", b, "br", br)
 			time.Sleep(interval)
 		}
 

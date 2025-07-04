@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo"
 )
 
-const VERSION = "v1.0.6"
+const VERSION = "v1.0.10"
 
 func main() {
 	e := echo.New()
@@ -35,10 +35,14 @@ func main() {
 
 	strip, err := led.NewSK9822(spiPort, numLEDs)
 	if err != nil {
-		log.Fatalf("Failed to initialize LED strip: %v", err)
+		log.Printf("Failed to initialize LED strip: %v\n", err)
 	}
 	// Ensure we clean up resources on exit.
-	defer strip.Close()
+	defer func() {
+		if strip != nil {
+			strip.Close()
+		}
+	}()
 
 	go led.Loop(strip)
 

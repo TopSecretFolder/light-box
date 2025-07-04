@@ -1,80 +1,40 @@
 # =====================================================================
 # Builder Stage
 #
-# This stage compiles the Go application. It uses a full Go development
-# image to have all the necessary tools.
+# This stage compiles the Go application.
 # =====================================================================
-# Using arm64v8 base image for better compatibility on RPi Zero 2 W (64-bit)
 FROM --platform=linux/arm64 golang:1.24-bookworm AS builder
 
-# Set the working directory inside the container
+# Set the working directory
 WORKDIR /app
 
-# Install C libraries and tools required for CGO and GPIO/SPI libraries.
-# Libraries like rpi-ws281x-go require these to build the underlying C components.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    scons \
-    cmake \
-    swig \
-    # Add any other specific C dependency development packages here
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy the go.mod and go.sum files to leverage Docker's build cache
+# Copy dependency manifests
 COPY go.mod go.sum ./
 
-# Download the Go module dependencies
+# Download Go module dependencies
 RUN go mod download
 
 # Copy the rest of the application's source code
 COPY . .
 
-# Compile the application for the Raspberry Pi Zero 2 W (64-bit).
-# GOARCH=arm64 is for the 64-bit ARMv8 architecture.
-# CGO_ENABLED=1 is crucial for building with C dependencies.
-RUN GOOS=linux GOARCH=arm64 CGO_ENABLED=1 go build -v -o myapp .
+# Compile the application, disabling CGO.
+# The binary will be statically linked, containing all dependencies.
+RUN GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -v -o myapp .
 
 # =====================================================================
 # Runtime Stage
 #
-# This stage creates the final, lightweight image. It copies the
-# compiled application and any necessary runtime dependencies.
+# This stage creates the final, lightweight image from scratch.
+# Since CGO is disabled, the resulting binary is self-contained
+# and does not need a base OS image with C libraries.
 # =====================================================================
-FROM --platform=linux/arm64 debian:bookworm-slim
+FROM scratch
 
 # Set the working directory
 WORKDIR /app
-
-# Install only the necessary runtime C libraries.
-# For many GPIO libraries, the C code is statically linked during the build,
-# so you may not need to add many packages here.
-# ca-certificates is good practice for any network requests.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
 
 # Copy the compiled application from the builder stage
 COPY --from=builder /app/myapp .
 
 # Set the command to run when the container starts
 ENTRYPOINT ["./myapp"]
-
-# =====================================================================
-# HOW TO RUN THIS CONTAINER
-#
-# To control GPIO/SPI, the container needs access to the host's hardware.
-# You must run the container with elevated privileges.
-#
-# Option 1: Privileged Mode (Easiest)
-# This gives the container full access to all host devices.
-#
-#   docker run --privileged -d your-image-name
-#
-# Option 2: Mapping Specific Devices (More Secure)
-# This only grants access to the necessary device files for GPIO and SPI.
-#
-#   docker run --device=/dev/gpiomem --device=/dev/spidev0.0 -d your-image-name
-#
-# Note: The device name `/dev/spidev0.0` might vary. Check the `/dev`
-# directory on your Raspberry Pi.
-# =====================================================================
