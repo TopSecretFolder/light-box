@@ -144,7 +144,7 @@ func Loop(strip *SK9822) {
 			r := ani.Red.SampleByte(x)
 			g := ani.Green.SampleByte(x)
 			b := ani.Blue.SampleByte(x)
-			br := ani.Brightness.SampleByte(x)
+			br := ani.Brightness.SampleByteMaxValue(x, 32)
 
 			strip.SetPixel(0, r, g, b, br)
 			if err := strip.Render(); err != nil {

@@ -25,6 +25,13 @@ func (c Curve) SampleByte(head float64) byte {
 
 }
 
+func (c Curve) SampleByteMaxValue(head float64, maxValue int) byte {
+	y := c.Sample(head)
+
+	return byte(math.Floor(y * float64(maxValue)))
+
+}
+
 func (c Curve) Domain() float64 {
 	if len(c) == 0 {
 		return 0
