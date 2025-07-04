@@ -17,11 +17,10 @@ func AnimationPulse() Animation {
 		},
 		Brightness: Curve{
 			Point{X: 0, Y: 1},
-			Point{X: 0.5, Y: 0},
 			Point{X: 1, Y: 1},
 		},
-		Frames:          120,
-		DurationSeconds: 10,
+		FPS:             10,
+		DurationSeconds: 1,
 		Interpolator:    Cubic,
 		ValueType:       HSV,
 	}

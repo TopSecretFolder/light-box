@@ -135,9 +135,10 @@ func Loop(strip *SK9822) {
 		}
 
 		domain := ani.Domain()
-		numIterations := ani.Frames
-		xInterval := domain / float64(ani.Frames)
-		interval := time.Duration(math.Round(ani.DurationSeconds / float64(ani.Frames) * float64(time.Second)))
+		secondsPerFrame := 1.0 / float64(ani.FPS)
+		interval := time.Duration(math.Round(float64(time.Second) * secondsPerFrame))
+		numIterations := int(math.Round(float64(ani.FPS) * ani.DurationSeconds))
+		xInterval := domain / float64(numIterations)
 
 		for i := range numIterations {
 			x := float64(i) * xInterval

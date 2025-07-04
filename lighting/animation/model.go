@@ -60,7 +60,7 @@ type Animation struct {
 	Value2          Curve        `json:"value_2"` // g or s
 	Value3          Curve        `json:"value_3"` // b or v
 	Brightness      Curve        `json:"brightness"`
-	Frames          int          `json:"frames"`
+	FPS             int          `json:"fps"`
 	DurationSeconds float64      `json:"duration_seconds"`
 }
 
