@@ -151,9 +151,6 @@ func Loop(strip *SK9822, numLEDs int) {
 				if strip != nil {
 					strip.SetPixel(j, r, g, b, br)
 				}
-				if j == 0 {
-					log.Println("r", r, "g", g, "b", b, "br", br)
-				}
 			}
 			if strip != nil {
 				if err := strip.Render(); err != nil {
