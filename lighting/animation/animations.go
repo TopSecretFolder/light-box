@@ -11,8 +11,8 @@ func AnimationPulse() Animation {
 					Point{X: 1, Y: 1},
 				},
 				Value2: Curve{
-					Point{X: 0, Y: 0.75},
-					Point{X: 1, Y: 0.75},
+					Point{X: 0, Y: 1},
+					Point{X: 1, Y: 1},
 				},
 				Value3: Curve{
 					Point{X: 0, Y: 0},
@@ -34,8 +34,8 @@ func AnimationPulse() Animation {
 					Point{X: 1, Y: 1},
 				},
 				Value2: Curve{
-					Point{X: 0, Y: 0.75},
-					Point{X: 1, Y: 0.75},
+					Point{X: 0, Y: 1},
+					Point{X: 1, Y: 1},
 				},
 				Value3: Curve{
 					Point{X: 0, Y: 0},
@@ -48,7 +48,7 @@ func AnimationPulse() Animation {
 				},
 				Interpolator: Linear,
 				ValueType:    HSV,
-				Offset:       -0.055 * 1,
+				Offset:       -0.025 * 1,
 			},
 			{
 
@@ -57,8 +57,8 @@ func AnimationPulse() Animation {
 					Point{X: 1, Y: 1},
 				},
 				Value2: Curve{
-					Point{X: 0, Y: 0.75},
-					Point{X: 1, Y: 0.75},
+					Point{X: 0, Y: 1},
+					Point{X: 1, Y: 1},
 				},
 				Value3: Curve{
 					Point{X: 0, Y: 0},
@@ -71,7 +71,7 @@ func AnimationPulse() Animation {
 				},
 				Interpolator: Linear,
 				ValueType:    HSV,
-				Offset:       -0.055 * 2,
+				Offset:       -0.025 * 2,
 			},
 			{
 
@@ -80,8 +80,8 @@ func AnimationPulse() Animation {
 					Point{X: 1, Y: 1},
 				},
 				Value2: Curve{
-					Point{X: 0, Y: 0.75},
-					Point{X: 1, Y: 0.75},
+					Point{X: 0, Y: 1},
+					Point{X: 1, Y: 1},
 				},
 				Value3: Curve{
 					Point{X: 0, Y: 0},
@@ -94,7 +94,7 @@ func AnimationPulse() Animation {
 				},
 				Interpolator: Linear,
 				ValueType:    HSV,
-				Offset:       -0.055 * 3,
+				Offset:       -0.025 * 3,
 			},
 			{
 
@@ -103,8 +103,8 @@ func AnimationPulse() Animation {
 					Point{X: 1, Y: 1},
 				},
 				Value2: Curve{
-					Point{X: 0, Y: 0.75},
-					Point{X: 1, Y: 0.75},
+					Point{X: 0, Y: 1},
+					Point{X: 1, Y: 1},
 				},
 				Value3: Curve{
 					Point{X: 0, Y: 0},
@@ -117,7 +117,7 @@ func AnimationPulse() Animation {
 				},
 				Interpolator: Linear,
 				ValueType:    HSV,
-				Offset:       -0.055 * 4,
+				Offset:       -0.025 * 4,
 			},
 			{
 
@@ -126,8 +126,8 @@ func AnimationPulse() Animation {
 					Point{X: 1, Y: 1},
 				},
 				Value2: Curve{
-					Point{X: 0, Y: 0.75},
-					Point{X: 1, Y: 0.75},
+					Point{X: 0, Y: 1},
+					Point{X: 1, Y: 1},
 				},
 				Value3: Curve{
 					Point{X: 0, Y: 0},
@@ -140,7 +140,7 @@ func AnimationPulse() Animation {
 				},
 				Interpolator: Linear,
 				ValueType:    HSV,
-				Offset:       -0.055 * 5,
+				Offset:       -0.025 * 5,
 			},
 			{
 
@@ -149,8 +149,8 @@ func AnimationPulse() Animation {
 					Point{X: 1, Y: 1},
 				},
 				Value2: Curve{
-					Point{X: 0, Y: 0.75},
-					Point{X: 1, Y: 0.75},
+					Point{X: 0, Y: 1},
+					Point{X: 1, Y: 1},
 				},
 				Value3: Curve{
 					Point{X: 0, Y: 0},
@@ -163,7 +163,7 @@ func AnimationPulse() Animation {
 				},
 				Interpolator: Linear,
 				ValueType:    HSV,
-				Offset:       -0.055 * 6,
+				Offset:       -0.025 * 6,
 			},
 			{
 
@@ -172,8 +172,8 @@ func AnimationPulse() Animation {
 					Point{X: 1, Y: 1},
 				},
 				Value2: Curve{
-					Point{X: 0, Y: 0.75},
-					Point{X: 1, Y: 0.75},
+					Point{X: 0, Y: 1},
+					Point{X: 1, Y: 1},
 				},
 				Value3: Curve{
 					Point{X: 0, Y: 0},
@@ -186,7 +186,7 @@ func AnimationPulse() Animation {
 				},
 				Interpolator: Linear,
 				ValueType:    HSV,
-				Offset:       -0.055 * 7,
+				Offset:       -0.025 * 7,
 			},
 			{
 
@@ -195,8 +195,8 @@ func AnimationPulse() Animation {
 					Point{X: 1, Y: 1},
 				},
 				Value2: Curve{
-					Point{X: 0, Y: 0.75},
-					Point{X: 1, Y: 0.75},
+					Point{X: 0, Y: 1},
+					Point{X: 1, Y: 1},
 				},
 				Value3: Curve{
 					Point{X: 0, Y: 0},
@@ -209,7 +209,7 @@ func AnimationPulse() Animation {
 				},
 				Interpolator: Linear,
 				ValueType:    HSV,
-				Offset:       -0.055 * 8,
+				Offset:       -0.025 * 8,
 			},
 			{
 
@@ -218,8 +218,8 @@ func AnimationPulse() Animation {
 					Point{X: 1, Y: 1},
 				},
 				Value2: Curve{
-					Point{X: 0, Y: 0.75},
-					Point{X: 1, Y: 0.75},
+					Point{X: 0, Y: 1},
+					Point{X: 1, Y: 1},
 				},
 				Value3: Curve{
 					Point{X: 0, Y: 0},
@@ -232,7 +232,7 @@ func AnimationPulse() Animation {
 				},
 				Interpolator: Linear,
 				ValueType:    HSV,
-				Offset:       -0.055 * 10,
+				Offset:       -0.025 * 10,
 			},
 			{
 
@@ -241,8 +241,8 @@ func AnimationPulse() Animation {
 					Point{X: 1, Y: 1},
 				},
 				Value2: Curve{
-					Point{X: 0, Y: 0.75},
-					Point{X: 1, Y: 0.75},
+					Point{X: 0, Y: 1},
+					Point{X: 1, Y: 1},
 				},
 				Value3: Curve{
 					Point{X: 0, Y: 0},
@@ -255,7 +255,7 @@ func AnimationPulse() Animation {
 				},
 				Interpolator: Linear,
 				ValueType:    HSV,
-				Offset:       -0.055 * 11,
+				Offset:       -0.025 * 11,
 			},
 			{
 
@@ -264,8 +264,8 @@ func AnimationPulse() Animation {
 					Point{X: 1, Y: 1},
 				},
 				Value2: Curve{
-					Point{X: 0, Y: 0.75},
-					Point{X: 1, Y: 0.75},
+					Point{X: 0, Y: 1},
+					Point{X: 1, Y: 1},
 				},
 				Value3: Curve{
 					Point{X: 0, Y: 0},
@@ -278,7 +278,7 @@ func AnimationPulse() Animation {
 				},
 				Interpolator: Linear,
 				ValueType:    HSV,
-				Offset:       -0.055 * 12,
+				Offset:       -0.025 * 12,
 			},
 			{
 
@@ -287,8 +287,8 @@ func AnimationPulse() Animation {
 					Point{X: 1, Y: 1},
 				},
 				Value2: Curve{
-					Point{X: 0, Y: 0.75},
-					Point{X: 1, Y: 0.75},
+					Point{X: 0, Y: 1},
+					Point{X: 1, Y: 1},
 				},
 				Value3: Curve{
 					Point{X: 0, Y: 0},
@@ -301,7 +301,7 @@ func AnimationPulse() Animation {
 				},
 				Interpolator: Linear,
 				ValueType:    HSV,
-				Offset:       -0.055 * 13,
+				Offset:       -0.025 * 13,
 			},
 			{
 
@@ -310,8 +310,8 @@ func AnimationPulse() Animation {
 					Point{X: 1, Y: 1},
 				},
 				Value2: Curve{
-					Point{X: 0, Y: 0.75},
-					Point{X: 1, Y: 0.75},
+					Point{X: 0, Y: 1},
+					Point{X: 1, Y: 1},
 				},
 				Value3: Curve{
 					Point{X: 0, Y: 0},
@@ -324,7 +324,7 @@ func AnimationPulse() Animation {
 				},
 				Interpolator: Linear,
 				ValueType:    HSV,
-				Offset:       -0.055 * 14,
+				Offset:       -0.025 * 14,
 			},
 			{
 
@@ -333,8 +333,8 @@ func AnimationPulse() Animation {
 					Point{X: 1, Y: 1},
 				},
 				Value2: Curve{
-					Point{X: 0, Y: 0.75},
-					Point{X: 1, Y: 0.75},
+					Point{X: 0, Y: 1},
+					Point{X: 1, Y: 1},
 				},
 				Value3: Curve{
 					Point{X: 0, Y: 0},
@@ -347,7 +347,7 @@ func AnimationPulse() Animation {
 				},
 				Interpolator: Linear,
 				ValueType:    HSV,
-				Offset:       -0.055 * 15,
+				Offset:       -0.025 * 15,
 			},
 			{
 
@@ -356,8 +356,8 @@ func AnimationPulse() Animation {
 					Point{X: 1, Y: 1},
 				},
 				Value2: Curve{
-					Point{X: 0, Y: 0.75},
-					Point{X: 1, Y: 0.75},
+					Point{X: 0, Y: 1},
+					Point{X: 1, Y: 1},
 				},
 				Value3: Curve{
 					Point{X: 0, Y: 0},
@@ -370,7 +370,7 @@ func AnimationPulse() Animation {
 				},
 				Interpolator: Linear,
 				ValueType:    HSV,
-				Offset:       -0.055 * 16,
+				Offset:       -0.025 * 16,
 			},
 			{
 
@@ -379,8 +379,8 @@ func AnimationPulse() Animation {
 					Point{X: 1, Y: 1},
 				},
 				Value2: Curve{
-					Point{X: 0, Y: 0.75},
-					Point{X: 1, Y: 0.75},
+					Point{X: 0, Y: 1},
+					Point{X: 1, Y: 1},
 				},
 				Value3: Curve{
 					Point{X: 0, Y: 0},
@@ -393,10 +393,10 @@ func AnimationPulse() Animation {
 				},
 				Interpolator: Linear,
 				ValueType:    HSV,
-				Offset:       -0.055 * 17,
+				Offset:       -0.025 * 17,
 			},
 		},
 		FPS:             60,
-		DurationSeconds: 5,
+		DurationSeconds: 1,
 	}
 }
