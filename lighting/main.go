@@ -44,7 +44,7 @@ func main() {
 		}
 	}()
 
-	go led.Loop(strip)
+	go led.Loop(strip, NUM_LEDS)
 
 	e.Logger.Fatal(e.Start(":80"))
 }

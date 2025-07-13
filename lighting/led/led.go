@@ -63,7 +63,7 @@ func NewSK9822(portName string, numLEDs int) (*SK9822, error) {
 
 	// The end frame is at the end of the buffer.
 	endFrameOffset := (numLEDs + 1) * 4
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		s.buffer[endFrameOffset+i] = 0xFF
 	}
 
@@ -129,7 +129,7 @@ func (s *SK9822) NumLEDs() int {
 	return s.numLEDs
 }
 
-func Loop(strip *SK9822) {
+func Loop(strip *SK9822, numLEDs int) {
 	// Infinite loop to blink the pixel.
 	prevAni := animation.AnimationPulse()
 	for {
@@ -138,25 +138,28 @@ func Loop(strip *SK9822) {
 			ani = prevAni
 		}
 
-		domain := ani.Domain()
 		secondsPerFrame := 1.0 / float64(ani.FPS)
 		interval := time.Duration(math.Round(float64(time.Second) * secondsPerFrame))
 		numIterations := int(math.Round(float64(ani.FPS) * ani.DurationSeconds))
-		xInterval := domain / float64(numIterations)
 
 		for i := range numIterations {
-			x := float64(i) * xInterval
-			r, g, b := ani.Sample(x)
-			br := ani.GetBrightness(x)
-			if strip != nil {
-				for i := range strip.NumLEDs() {
-					strip.SetPixel(i, r, g, b, br)
+			for j := range numLEDs {
+				xInterval := ani.Domain(j) / float64(numIterations)
+				x := float64(i) * xInterval
+				r, g, b := ani.Sample(x, j)
+				br := ani.GetBrightness(x, j)
+				if strip != nil {
+					strip.SetPixel(j, r, g, b, br)
 				}
+				if j == 0 {
+					log.Println("r", r, "g", g, "b", b, "br", br)
+				}
+			}
+			if strip != nil {
 				if err := strip.Render(); err != nil {
 					log.Printf("Failed to render OFF state: %v", err)
 				}
 			}
-			// log.Println("r", r, "g", g, "b", b, "br", br)
 			time.Sleep(interval)
 		}
 

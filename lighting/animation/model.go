@@ -38,6 +38,15 @@ func (c Curve) Domain() float64 {
 	return c[len(c)-1].X - c[0].X
 }
 
+type Track struct {
+	Interpolator Interpolator `json:"interpolator"`
+	ValueType    ValueType    `json:"value_type"`
+	Value1       Curve        `json:"value_1"` // r or h
+	Value2       Curve        `json:"value_2"` // g or s
+	Value3       Curve        `json:"value_3"` // b or v
+	Brightness   Curve        `json:"brightness"`
+}
+
 type Interpolator string
 
 const (
@@ -53,31 +62,79 @@ const (
 )
 
 type Animation struct {
-	Name            string       `json:"name"`
-	Interpolator    Interpolator `json:"interpolator"`
-	ValueType       ValueType    `json:"value_type"`
-	Value1          Curve        `json:"value_1"` // r or h
-	Value2          Curve        `json:"value_2"` // g or s
-	Value3          Curve        `json:"value_3"` // b or v
-	Brightness      Curve        `json:"brightness"`
-	FPS             int          `json:"fps"`
-	DurationSeconds float64      `json:"duration_seconds"`
+	Name            string  `json:"name"`
+	Tracks          []Track `json:"tracks"`
+	FPS             int     `json:"fps"`
+	DurationSeconds float64 `json:"duration_seconds"`
 }
 
-func (a Animation) GetBrightness(head float64) byte {
-	return a.Brightness.SampleByteMaxValue(head, 10, a.Interpolator)
+func (a Animation) GetBrightness(head float64, trackIndex int) byte {
+	return a.track(trackIndex).Brightness.SampleByteMaxValue(head, 10, a.track(trackIndex).Interpolator)
 }
 
-func (a Animation) Sample(head float64) (r byte, g byte, b byte) {
-	v1 := a.Value1.Sample(head, a.Interpolator)
-	v2 := a.Value2.Sample(head, a.Interpolator)
-	v3 := a.Value3.Sample(head, a.Interpolator)
+func (a Animation) Sample(head float64, trackIndex int) (r byte, g byte, b byte) {
+	v1 := a.track(trackIndex).Value1.Sample(head, a.track(trackIndex).Interpolator)
+	v2 := a.track(trackIndex).Value2.Sample(head, a.track(trackIndex).Interpolator)
+	v3 := a.track(trackIndex).Value3.Sample(head, a.track(trackIndex).Interpolator)
 
-	if a.ValueType == HSV {
+	if a.track(trackIndex).ValueType == HSV {
 		r, g, b := HSVToRGB(v1, v2, v3)
 		return ToByte(r, g, b)
 	}
 	return ToByte(v1, v2, v3)
+}
+
+func (a Animation) track(i int) Track {
+	if i < len(a.Tracks) {
+		return a.Tracks[i]
+	}
+
+	// by default if no track exists for index i, then return zero valued
+	// track
+	return Track{
+		Interpolator: Linear,
+		ValueType:    HSV,
+		Value1: Curve{
+			{
+				X: 0,
+				Y: 0,
+			},
+			{
+				X: 1,
+				Y: 0,
+			},
+		},
+		Value2: Curve{
+			{
+				X: 0,
+				Y: 0,
+			},
+			{
+				X: 1,
+				Y: 0,
+			},
+		},
+		Value3: Curve{
+			{
+				X: 0,
+				Y: 0,
+			},
+			{
+				X: 1,
+				Y: 0,
+			},
+		},
+		Brightness: Curve{
+			{
+				X: 0,
+				Y: 0,
+			},
+			{
+				X: 1,
+				Y: 0,
+			},
+		},
+	}
 }
 
 func ToByte(v1 float64, v2 float64, v3 float64) (byte, byte, byte) {
@@ -117,12 +174,12 @@ func HSVToRGB(h, s, v float64) (float64, float64, float64) {
 	}
 }
 
-func (a Animation) Domain() float64 {
-	rdomain := a.Value1.Domain()
-	gdomain := a.Value2.Domain()
-	bdomain := a.Value3.Domain()
-	brdomain := a.Brightness.Domain()
-	return math.Max(math.Max(math.Max(rdomain, gdomain), bdomain), brdomain)
+func (a Animation) Domain(trackIndex int) float64 {
+	d1 := a.track(trackIndex).Value1.Domain()
+	d2 := a.track(trackIndex).Value2.Domain()
+	d3 := a.track(trackIndex).Value3.Domain()
+	dbr := a.track(trackIndex).Brightness.Domain()
+	return math.Max(math.Max(math.Max(d1, d2), d3), dbr)
 }
 
 // Point represents a 2D point.
