@@ -145,7 +145,7 @@ func Loop(strip *SK9822, numLEDs int) {
 		for i := range numIterations {
 			for j := range numLEDs {
 				xInterval := ani.Domain(j) / float64(numIterations)
-				x := float64(i) * xInterval
+				x := float64(i)*xInterval + ani.Offset(j)
 				r, g, b := ani.Sample(x, j)
 				br := ani.GetBrightness(x, j)
 				if strip != nil {

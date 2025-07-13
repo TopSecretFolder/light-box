@@ -9,6 +9,14 @@ import (
 type Curve []Point
 
 func (c Curve) Sample(head float64, interpolator Interpolator) float64 {
+	if head < 0 {
+		return 0
+	}
+
+	if head > 1 {
+		return 0
+	}
+
 	switch interpolator {
 	case Linear:
 		return LinearInterpolator(c)(head)
@@ -45,6 +53,7 @@ type Track struct {
 	Value2       Curve        `json:"value_2"` // g or s
 	Value3       Curve        `json:"value_3"` // b or v
 	Brightness   Curve        `json:"brightness"`
+	Offset       float64      `json:"offset"`
 }
 
 type Interpolator string
@@ -180,6 +189,10 @@ func (a Animation) Domain(trackIndex int) float64 {
 	d3 := a.track(trackIndex).Value3.Domain()
 	dbr := a.track(trackIndex).Brightness.Domain()
 	return math.Max(math.Max(math.Max(d1, d2), d3), dbr)
+}
+
+func (a Animation) Offset(trackIndex int) float64 {
+	return a.track(trackIndex).Offset
 }
 
 // Point represents a 2D point.
