@@ -171,7 +171,7 @@ func CubicInterpolator(points Curve) func(t float64) float64 {
 	// Create a new natural cubic spline interpolator.
 	// Natural splines have zero second derivatives at the endpoints,
 	// which is a common and safe choice.
-	spline := interp.NaturalCubic{}
+	spline := interp.ClampedCubic{}
 	spline.Fit(xs, ys)
 
 	// Return the prediction function.

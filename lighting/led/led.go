@@ -125,6 +125,8 @@ func (s *SK9822) Close() {
 	}
 }
 
+const NUM_PIXELS = 18
+
 func Loop(strip *SK9822) {
 	// Infinite loop to blink the pixel.
 	prevAni := animation.AnimationPulse()
@@ -145,7 +147,9 @@ func Loop(strip *SK9822) {
 			r, g, b := ani.Sample(x)
 			br := ani.GetBrightness(x)
 			if strip != nil {
-				strip.SetPixel(0, r, g, b, br)
+				for i := range NUM_PIXELS {
+					strip.SetPixel(i, r, g, b, br)
+				}
 				if err := strip.Render(); err != nil {
 					log.Printf("Failed to render OFF state: %v", err)
 				}

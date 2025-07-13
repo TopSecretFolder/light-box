@@ -19,8 +19,8 @@ func AnimationPulse() Animation {
 			Point{X: 0, Y: 1},
 			Point{X: 1, Y: 1},
 		},
-		FPS:             10,
-		DurationSeconds: 1,
+		FPS:             30,
+		DurationSeconds: 5,
 		Interpolator:    Cubic,
 		ValueType:       HSV,
 	}

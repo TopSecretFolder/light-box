@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo"
 )
 
-const VERSION = "v1.0.10"
+const VERSION = "v1.0.11"
 
 func main() {
 	e := echo.New()
@@ -29,11 +29,11 @@ func main() {
 	})
 
 	// The number of LEDs in your strip. We only use the first one.
-	const numLEDs = 1
+	const NUM_LEDS = 18
 	// The SPI device path. "/dev/spidev0.0" is standard.
 	const spiPort = "/dev/spidev0.0" // An empty string uses the default SPI bus.
 
-	strip, err := led.NewSK9822(spiPort, numLEDs)
+	strip, err := led.NewSK9822(spiPort, NUM_LEDS)
 	if err != nil {
 		log.Printf("Failed to initialize LED strip: %v\n", err)
 	}
