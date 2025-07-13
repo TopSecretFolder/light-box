@@ -125,7 +125,9 @@ func (s *SK9822) Close() {
 	}
 }
 
-const NUM_PIXELS = 18
+func (s *SK9822) NumLEDs() int {
+	return s.numLEDs
+}
 
 func Loop(strip *SK9822) {
 	// Infinite loop to blink the pixel.
@@ -147,7 +149,7 @@ func Loop(strip *SK9822) {
 			r, g, b := ani.Sample(x)
 			br := ani.GetBrightness(x)
 			if strip != nil {
-				for i := range NUM_PIXELS {
+				for i := range strip.NumLEDs() {
 					strip.SetPixel(i, r, g, b, br)
 				}
 				if err := strip.Render(); err != nil {
