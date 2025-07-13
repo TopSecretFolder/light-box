@@ -8,8 +8,8 @@ func AnimationPulse() Animation {
 			Point{X: 1, Y: 1},
 		},
 		Value2: Curve{
-			Point{X: 0, Y: 0.5},
-			Point{X: 1, Y: 0.5},
+			Point{X: 0, Y: 0.75},
+			Point{X: 1, Y: 0.75},
 		},
 		Value3: Curve{
 			Point{X: 0, Y: 1},
@@ -21,7 +21,7 @@ func AnimationPulse() Animation {
 		},
 		FPS:             60,
 		DurationSeconds: 5,
-		Interpolator:    Cubic,
+		Interpolator:    Linear,
 		ValueType:       HSV,
 	}
 }
