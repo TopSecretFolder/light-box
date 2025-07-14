@@ -24,7 +24,9 @@ func ResolveLua(script string) (Animation, error) {
 
 	var ani Animation
 	m := gluamapper.NewMapper(gluamapper.Option{
-		TagName: "json",
+		TagName:     "json",
+		ErrorUnused: true,
+		NameFunc:    func(s string) string { return s },
 	})
 	if err := m.Map(luaTable, &ani); err != nil {
 		return Animation{}, fmt.Errorf("error mapping lua table to go struct: %w", err)
