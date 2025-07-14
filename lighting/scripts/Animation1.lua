@@ -37,7 +37,7 @@ local function shuffle_in_place(tbl)
 	end
 end
 
-function reverse_in_place(tbl)
+local function reverse_in_place(tbl)
 	local n = #tbl
 	for i = 1, n / 2 do
 		tbl[i], tbl[n - i + 1] = tbl[n - i + 1], tbl[i]
