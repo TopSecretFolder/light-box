@@ -11,7 +11,7 @@ import (
 	"github.com/labstack/echo"
 )
 
-const VERSION = "v1.0.11"
+const VERSION = "v1.0.20"
 
 func main() {
 	e := echo.New()
