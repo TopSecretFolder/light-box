@@ -67,7 +67,7 @@ return animation
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, gotErr := Resolve(tt.script)
+			got, gotErr := ResolveLua(tt.script)
 			assert.NoError(t, gotErr)
 			assert.NotZero(t, got)
 			t.Log(pretty(got))

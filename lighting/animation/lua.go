@@ -7,7 +7,7 @@ import (
 	"github.com/yuin/gopher-lua"
 )
 
-func Resolve(script string) (Animation, error) {
+func ResolveLua(script string) (Animation, error) {
 	// 1. Create a new Lua state
 	L := lua.NewState()
 	defer L.Close()

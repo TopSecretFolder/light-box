@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"light-box/animation"
 	"light-box/led"
 	"log"
@@ -18,13 +19,28 @@ func main() {
 		return c.String(http.StatusOK, "Light Box Server: "+VERSION)
 	})
 
-	e.POST("/animation/push", func(ctx echo.Context) error {
+	e.POST("/animation/push/json", func(ctx echo.Context) error {
 		a := animation.Animation{}
 		if err := ctx.Bind(&a); err != nil {
 			return fmt.Errorf("error pushing animation: %w", err)
 		}
 
 		animation.GlobalManager.Enqueue(a)
+		return nil
+	})
+
+	e.POST("/animation/push/lua", func(ctx echo.Context) error {
+		b, err := io.ReadAll(ctx.Request().Body)
+		if err != nil {
+			return fmt.Errorf("error pushing animation: %w", err)
+		}
+
+		ani, err := animation.ResolveLua(string(b))
+		if err != nil {
+			return err
+		}
+
+		animation.GlobalManager.Enqueue(ani)
 		return nil
 	})
 
