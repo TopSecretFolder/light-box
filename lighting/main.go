@@ -20,13 +20,13 @@ func main() {
 	})
 
 	e.POST("/animation/push/json", func(ctx echo.Context) error {
-		a := animation.Animation{}
-		if err := ctx.Bind(&a); err != nil {
+		ani := animation.Animation{}
+		if err := ctx.Bind(&ani); err != nil {
 			return fmt.Errorf("error pushing animation: %w", err)
 		}
 
-		animation.GlobalManager.Enqueue(a)
-		return nil
+		animation.GlobalManager.Enqueue(ani)
+		return ctx.JSON(200, ani)
 	})
 
 	e.POST("/animation/push/lua", func(ctx echo.Context) error {
@@ -41,7 +41,8 @@ func main() {
 		}
 
 		animation.GlobalManager.Enqueue(ani)
-		return nil
+
+		return ctx.JSON(200, ani)
 	})
 
 	// The number of LEDs in your strip. We only use the first one.
