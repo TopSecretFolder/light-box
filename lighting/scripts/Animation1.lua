@@ -5,23 +5,23 @@ local function create_track(offset)
 		interpolator = "linear",
 		value_type = "hsv",
 		value_1 = {
-			{ x = 0, y = 0.7 },
-			{ x = 0.5, y = 0.75 },
-			{ x = 1, y = 0.75 },
+			{ x = 0, y = 0.68 },
+			{ x = 0.25, y = 0.68 },
+			{ x = 0.5, y = 0.71 },
 		},
 		value_2 = {
 			{ x = 0, y = 1 },
-			{ x = 0.5, y = 1 },
 			{ x = 1, y = 1 },
 		},
 		value_3 = {
 			{ x = 0, y = 0 },
+			{ x = 0.2, y = 1 },
 			{ x = 0.25, y = 1 },
 			{ x = 0.5, y = 0 },
 		},
 		brightness = {
-			{ x = 0, y = 1 },
-			{ x = 1, y = 1 },
+			{ x = 0, y = 1.0 },
+			{ x = 1, y = 1.0 },
 		},
 		offset = offset,
 	}
@@ -37,8 +37,8 @@ local animation = {
 
 -- Use a loop to generate the 17 tracks with varying offsets.
 -- This is much cleaner than defining all 17 by hand.
-for i = 0, 16 do
-	local current_offset = i * -0.025
+for i = 0, 17 do
+	local current_offset = -i / 18 / 2
 	table.insert(animation.tracks, create_track(current_offset))
 end
 
