@@ -48,7 +48,7 @@ end
 local animation = {
 	name = "Animation 1",
 	fps = 60,
-	duration_seconds = 3,
+	duration_seconds = 5,
 	tracks = {}, -- An empty table to hold the tracks
 }
 
