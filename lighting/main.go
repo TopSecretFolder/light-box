@@ -5,17 +5,26 @@ import (
 	"io"
 	"light-box/animation"
 	"light-box/led"
+	"light-box/vue"
 	"log"
 	"net/http"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 const VERSION = "v1.0.20"
 
 func main() {
 	e := echo.New()
-	e.GET("/", func(c echo.Context) error {
+
+	vueFS, err := vue.RawDistFS()
+	if err != nil {
+		log.Fatalf("error setting up static file handler: %w", err)
+	}
+
+	e.StaticFS("/", vueFS)
+
+	e.GET("/about", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Light Box Server: "+VERSION)
 	})
 
@@ -43,6 +52,18 @@ func main() {
 		animation.GlobalManager.Enqueue(ani)
 
 		return ctx.JSON(200, ani)
+	})
+
+	e.POST("/script/push/lua", func(ctx echo.Context) error {
+		// TODO: register script as current frame generator
+		_, err := io.ReadAll(ctx.Request().Body)
+		if err != nil {
+			return fmt.Errorf("error pushing animation: %w", err)
+		}
+
+		// push a lua script for frame gen
+
+		return ctx.JSON(200, nil)
 	})
 
 	// The number of LEDs in your strip. We only use the first one.
