@@ -3,10 +3,12 @@ package led
 import (
 	"fmt"
 	"light-box/animation"
+	"light-box/natsserver"
 	"log"
 	"math"
 	"time"
 
+	"github.com/nats-io/nats.go"
 	"periph.io/x/conn/v3/physic"
 	"periph.io/x/conn/v3/spi"
 	"periph.io/x/conn/v3/spi/spireg"
@@ -132,6 +134,13 @@ func (s *SK9822) NumLEDs() int {
 func Loop(strip *SK9822, numLEDs int) {
 	// Infinite loop to blink the pixel.
 	prevAni := animation.AnimationPulse()
+	natsserver.GlobalNatsManager.C.Subscribe(
+		"new-script",
+		func(msg *nats.Msg) {
+			msg.Ack()
+		},
+	)
+
 	for {
 		ani, found := animation.GlobalManager.Dequeue()
 		if !found {
@@ -151,6 +160,18 @@ func Loop(strip *SK9822, numLEDs int) {
 				if strip != nil {
 					strip.SetPixel(j, r, g, b, br)
 				}
+
+				go natsserver.GlobalNatsManager.C.Publish(
+					"led-debug",
+					fmt.Appendf(nil,
+						"r: %d g: %d b: %d br: %d",
+						r,
+						g,
+						b,
+						br,
+					),
+				)
+
 			}
 			if strip != nil {
 				if err := strip.Render(); err != nil {

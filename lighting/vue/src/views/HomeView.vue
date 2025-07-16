@@ -1,9 +1,18 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
+import { ref } from 'vue'
+
+const stuff = fetch('/about')
+stuff.then((d) => {
+  d.text().then((b) => {
+    data.value = b
+  })
+})
+
+const data = ref('')
 </script>
 
 <template>
   <main>
-    <TheWelcome />
+    {{ data }}
   </main>
 </template>
