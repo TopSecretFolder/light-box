@@ -17,6 +17,9 @@ importers:
       konva:
         specifier: ^9.3.20
         version: 9.3.20
+      nats.ws:
+        specifier: ^1.30.3
+        version: 1.30.3
       tailwindcss:
         specifier: ^4.1.11
         version: 4.1.11
@@ -1523,8 +1526,15 @@ packages:
     engines: {node: ^18 || >=20}
     hasBin: true
 
+  nats.ws@1.30.3:
+    resolution: {integrity: sha512-aM77V2SEc+B6lbxCMZK3qfRy4jg8pmHj+wZzQKDiDIQYhLPj6U2NSHHBex0syj72Ayzl4uR5Lp3aKXTaVLbRpw==}
+
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
+
+  nkeys.js@1.1.0:
+    resolution: {integrity: sha512-tB/a0shZL5UZWSwsoeyqfTszONTt4k2YS0tuQioMOD180+MbombYVgzDUYHlx+gejYK6rgf08n/2Df99WY0Sxg==}
+    engines: {node: '>=10.0.0'}
 
   node-releases@2.0.19:
     resolution: {integrity: sha512-xxOWJsBKtzAq7DY0J+DTzuz58K8e7sJbdgwkbMWQe8UYB6ekmsQ45q0M/tJDsGaZmbC+l7n57UV8Hl5tHxO9uw==}
@@ -1755,6 +1765,9 @@ packages:
     engines: {node: '>=18.12'}
     peerDependencies:
       typescript: '>=4.8.4'
+
+  tweetnacl@1.0.3:
+    resolution: {integrity: sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==}
 
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
@@ -3292,7 +3305,16 @@ snapshots:
 
   nanoid@5.1.5: {}
 
+  nats.ws@1.30.3:
+    optionalDependencies:
+      nkeys.js: 1.1.0
+
   natural-compare@1.4.0: {}
+
+  nkeys.js@1.1.0:
+    dependencies:
+      tweetnacl: 1.0.3
+    optional: true
 
   node-releases@2.0.19: {}
 
@@ -3516,6 +3538,9 @@ snapshots:
   ts-api-utils@2.1.0(typescript@5.8.3):
     dependencies:
       typescript: 5.8.3
+
+  tweetnacl@1.0.3:
+    optional: true
 
   type-check@0.4.0:
     dependencies:

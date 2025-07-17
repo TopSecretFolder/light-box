@@ -1,18 +1,35 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { subscribeTo, unsubscribeFrom, messagesBySubject } from '@/nats/nats'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
-const stuff = fetch('/about')
-stuff.then((d) => {
+const about = ref('')
+
+fetch('/about').then((d) => {
   d.text().then((b) => {
-    data.value = b
+    about.value = b
   })
 })
 
-const data = ref('')
+onMounted(() => {
+  subscribeTo('led-debug')
+})
+
+onUnmounted(() => {
+  unsubscribeFrom('led-debug')
+})
+
+const ledDebugMsgs = computed(() => {
+  return messagesBySubject.get('led-debug') ?? []
+})
 </script>
 
 <template>
   <main>
-    {{ data }}
+    <section>
+      {{ about }}
+    </section>
+    <section>
+      {{ ledDebugMsgs }}
+    </section>
   </main>
 </template>

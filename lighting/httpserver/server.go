@@ -17,7 +17,7 @@ func NewEchoServer(version string) *echo.Echo {
 
 	vueFS, err := vue.RawDistFS()
 	if err != nil {
-		log.Fatalf("error setting up static file handler: %w", err)
+		log.Fatalf("error setting up static file handler: %s", err.Error())
 	}
 
 	e.StaticFS("/", vueFS)
@@ -59,4 +59,6 @@ func NewEchoServer(version string) *echo.Echo {
 
 		return ctx.JSON(200, nil)
 	})
+
+	return e
 }

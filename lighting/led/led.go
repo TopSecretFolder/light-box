@@ -134,7 +134,7 @@ func (s *SK9822) NumLEDs() int {
 func Loop(strip *SK9822, numLEDs int) {
 	// Infinite loop to blink the pixel.
 	prevAni := animation.AnimationPulse()
-	natsserver.GlobalNatsManager.C.Subscribe(
+	natsserver.Manager.C.Subscribe(
 		"new-script",
 		func(msg *nats.Msg) {
 			msg.Ack()
@@ -161,7 +161,7 @@ func Loop(strip *SK9822, numLEDs int) {
 					strip.SetPixel(j, r, g, b, br)
 				}
 
-				go natsserver.GlobalNatsManager.C.Publish(
+				go natsserver.Manager.C.Publish(
 					"led-debug",
 					fmt.Appendf(nil,
 						"r: %d g: %d b: %d br: %d",

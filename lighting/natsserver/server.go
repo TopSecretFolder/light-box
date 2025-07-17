@@ -8,15 +8,15 @@ import (
 	"github.com/nats-io/nats.go"
 )
 
-var GlobalNatsManager *NatsManager = nil
+var Manager *NatsManager = nil
 
 func SetupGlobalNatsManager() {
-	nm, err := NewNatsServer()
+	nm, err := newNatsServer()
 	if err != nil {
 		panic(err)
 	}
 
-	GlobalNatsManager = nm
+	Manager = nm
 }
 
 type NatsManager struct {
@@ -28,13 +28,14 @@ func (nm NatsManager) Close() {
 	nm.C.Close()
 }
 
-func NewNatsServer() (*NatsManager, error) {
+func newNatsServer() (*NatsManager, error) {
 	ns, err := server.NewServer(&server.Options{
 		Host: "0.0.0.0",
 		Port: 4222,
 		Websocket: server.WebsocketOpts{
-			Host: "0.0.0.0",
-			Port: 8080,
+			Host:  "0.0.0.0",
+			Port:  8080,
+			NoTLS: true,
 		},
 	})
 	if err != nil {
