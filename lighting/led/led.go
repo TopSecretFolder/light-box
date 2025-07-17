@@ -10,7 +10,6 @@ import (
 	"math"
 	"time"
 
-	"github.com/nats-io/nats.go"
 	"periph.io/x/conn/v3/physic"
 	"periph.io/x/conn/v3/spi"
 	"periph.io/x/conn/v3/spi/spireg"
@@ -142,12 +141,6 @@ type LedDebugState struct {
 func Loop(strip *SK9822, numLEDs int) {
 	// Infinite loop to blink the pixel.
 	prevAni := animation.AnimationPulse()
-	natsserver.Manager.C.Subscribe(
-		"new-script",
-		func(msg *nats.Msg) {
-			msg.Ack()
-		},
-	)
 
 	for {
 		ani, found := animation.GlobalManager.Dequeue()

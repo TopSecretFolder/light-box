@@ -1,10 +1,13 @@
 package main
 
 import (
+	"light-box/animation"
 	"light-box/httpserver"
 	"light-box/led"
 	"light-box/natsserver"
 	"log"
+
+	"github.com/nats-io/nats.go"
 )
 
 const VERSION = "v1.0.20"
@@ -12,6 +15,17 @@ const VERSION = "v1.0.20"
 func main() {
 	// NATS SETUP
 	natsserver.SetupGlobalNatsManager()
+	natsserver.Manager.C.Subscribe(
+		"new-script",
+		func(msg *nats.Msg) {
+			defer msg.Ack()
+			ani, err := animation.ResolveLua(string(msg.Data))
+			if err != nil {
+				return
+			}
+			animation.GlobalManager.Enqueue(ani)
+		},
+	)
 
 	// LED CONTROLLER PROCESS
 	const NUM_LEDS = 18

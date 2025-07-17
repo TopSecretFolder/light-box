@@ -70,3 +70,7 @@ export function unsubscribeFrom(subject: string, handler: (msg: string) => void)
     }
   }
 }
+
+export function publish(subject: string, data: string) {
+  nc?.publish(subject, data)
+}
