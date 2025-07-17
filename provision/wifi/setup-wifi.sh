@@ -1,46 +1,35 @@
 #!/bin/bash
 #
-# Script to configure Wi-Fi using NetworkManager (nmcli) from a file in /boot.
-# Modified for robustness when run as a systemd service.
+# Script to configure Wi-Fi using NetworkManager (nmcli) by trying multiple
+# credential files found in /boot/firmware/.
 #
 
 set -e # Exit immediately if a command exits with a non-zero status.
 
 echo "Starting NetworkManager Wi-Fi setup script..."
 
-CREDS_FILE="/boot/firmware/wifi_credentials.txt"
+CREDS_PATH_PATTERN="/boot/firmware/wifi_credentials_*.txt"
 
-# 1. Check if the credentials file exists
-if [ ! -f "$CREDS_FILE" ]; then
-    echo "Error: Credentials file not found at $CREDS_FILE. Aborting."
+# 1. Check if any credential files exist
+# Use 'ls' to check for files matching the pattern. Redirect output to /dev/null.
+# If ls returns a non-zero status, no files were found.
+if ! ls $CREDS_PATH_PATTERN >/dev/null 2>&1; then
+    echo "Error: No Wi-Fi credential files found matching '$CREDS_PATH_PATTERN'. Aborting."
     exit 1
 fi
 
-# 2. Read credentials from the file, removing any carriage returns (^M)
-SSID=$(grep -E '^SSID=' "$CREDS_FILE" | cut -d'=' -f2- | tr -d '\r')
-PSK=$(grep -E '^PSK=' "$CREDS_FILE" | cut -d'=' -f2- | tr -d '\r')
-
-# 3. Validate that the variables were read correctly
-if [ -z "$SSID" ] || [ -z "$PSK" ]; then
-    echo "Error: Could not read SSID or PSK from $CREDS_FILE. Please check the file format."
-    exit 1
-fi
-
-echo "Credentials read successfully for SSID: $SSID"
-
-# ==================== NEW: WAIT AND RESCAN SECTION ====================
+# ==================== WAIT AND RESCAN SECTION ====================
 # Give the Wi-Fi adapter a few seconds to power on and initialize.
 echo "Waiting 5 seconds for the Wi-Fi hardware to initialize..."
 sleep 5
 
 # Explicitly tell NetworkManager to perform a new Wi-Fi scan.
 echo "Forcing a new Wi-Fi scan..."
-# The 'nmcli device wifi rescan' command tells NetworkManager to look for networks right now.
 nmcli device wifi rescan
 echo "Scan complete."
 # ======================================================================
 
-# 4. To ensure a clean slate, delete ALL existing Wi-Fi profiles.
+# 2. To ensure a clean slate, delete ALL existing Wi-Fi profiles.
 echo "Searching for and deleting all existing Wi-Fi connection profiles..."
 nmcli -g NAME,TYPE c show | grep ':802-11-wireless$' | cut -d':' -f1 | while read -r conn_name; do
     if [ -n "$conn_name" ]; then
@@ -49,33 +38,40 @@ nmcli -g NAME,TYPE c show | grep ':802-11-wireless$' | cut -d':' -f1 | while rea
     fi
 done
 
-# 5. Create a new connection and activate it.
-# This loop will now retry the connection up to 4 times.
-echo "Attempting to create and connect to new Wi-Fi network '$SSID'..."
-for i in {1..4}; do
+# 3. Loop through all found credential files and attempt to connect.
+echo "Searching for networks to join..."
+for creds_file in $CREDS_PATH_PATTERN; do
+    echo "--- Processing credentials from: $creds_file ---"
+
+    # Read credentials from the file, removing any carriage returns (^M)
+    SSID=$(grep -E '^SSID=' "$creds_file" | cut -d'=' -f2- | tr -d '\r')
+    PSK=$(grep -E '^PSK=' "$creds_file" | cut -d'=' -f2- | tr -d '\r')
+
+    # Validate that the variables were read correctly
+    if [ -z "$SSID" ] || [ -z "$PSK" ]; then
+        echo "Warning: Could not read SSID or PSK from $creds_file. Skipping."
+        continue # Move to the next file
+    fi
+
+    echo "Attempting to connect to network '$SSID'..."
+
     # Use 'set +e' to temporarily disable exit-on-error for the connection attempt
     set +e
     nmcli device wifi connect "$SSID" password "$PSK" ifname wlan0
-    
+
     # Check the exit code of the last command. 0 means success.
     if [ $? -eq 0 ]; then
         # Re-enable exit-on-error
         set -e
-        echo "Successfully connected to '$SSID'."
+        echo "✅ Successfully connected to '$SSID' using credentials from $creds_file."
         echo "Wi-Fi setup script finished."
         exit 0 # Exit the script successfully
     fi
     # Re-enable exit-on-error
     set -e
 
-    # If it failed, wait before retrying
-    if [ $i -lt 4 ]; then
-      echo "Connection failed (Attempt $i). Retrying in 5 seconds..."
-      sleep 5
-      # Also rescan before the next attempt
-      nmcli device wifi rescan
-    fi
+    echo "Connection to '$SSID' failed. Trying next available credentials..."
 done
 
-echo "Could not connect to the network after several attempts. Aborting."
+echo "❌ Could not connect to any network after trying all available credential files. Aborting."
 exit 1 # Exit the script with an error status
