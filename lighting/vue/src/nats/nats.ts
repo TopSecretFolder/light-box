@@ -44,7 +44,6 @@ export function subscribeTo(subject: string, handler: (msg: string) => void) {
   ;(async () => {
     for await (const msg of sub!) {
       const data = sc.decode(msg.data)
-      console.log('data', data)
       const handlers = handlersBySubject.get(subject)
       if (handlers) {
         for (const handler of handlers) {
