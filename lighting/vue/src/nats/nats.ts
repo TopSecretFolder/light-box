@@ -2,9 +2,10 @@
 import { ref, reactive } from 'vue'
 import { connect, StringCodec, type NatsConnection, type Subscription } from 'nats.ws'
 
-// Reactive state shared globally
-export const isConnected = ref(false)
-const messagesBySubject = reactive<Map<string, string[]>>(new Map())
+export type MsgHandler = (msg: string) => void
+
+const handlersBySubject = new Map<string, Set<MsgHandler>>()
+
 const subscriptions = new Map<string, Subscription>()
 
 let nc: NatsConnection | null = null
@@ -14,8 +15,7 @@ const sc = StringCodec()
 export async function connectNats() {
   if (nc) return // Already connected
   try {
-    nc = await connect({ servers: `ws://${window.location.host}` })
-    isConnected.value = true
+    nc = await connect({ servers: `ws://${window.location.hostname}:8080` })
     console.log(`Connected to NATS server: ${nc.getServer()}`)
   } catch (err) {
     console.error('Error connecting to NATS:', err)
@@ -23,33 +23,50 @@ export async function connectNats() {
 }
 
 // Subscribe to a subject
-export function subscribeTo(subject: string) {
-  if (!nc || subscriptions.has(subject)) return
+export function subscribeTo(subject: string, handler: (msg: string) => void) {
+  if (!nc) return
 
-  // Ensure an array exists for this subject's messages
-  if (!messagesBySubject.has(subject)) {
-    messagesBySubject.set(subject, [])
+  if (!handlersBySubject.has(subject)) {
+    handlersBySubject.set(subject, new Set<MsgHandler>())
   }
 
-  const sub = nc.subscribe(subject)
-  subscriptions.set(subject, sub)
+  const handlers = handlersBySubject.get(subject)
+  handlers?.add(handler)
+
+  let sub
+  if (!subscriptions.has(subject)) {
+    sub = nc.subscribe(subject)
+    subscriptions.set(subject, sub)
+  } else {
+    sub = subscriptions.get(subject)
+  }
+
   ;(async () => {
-    for await (const msg of sub) {
+    for await (const msg of sub!) {
       const data = sc.decode(msg.data)
-      messagesBySubject.get(subject)?.push(data)
+      console.log('data', data)
+      const handlers = handlersBySubject.get(subject)
+      if (handlers) {
+        for (const handler of handlers) {
+          handler(data)
+        }
+      }
     }
   })()
 }
 
 // Unsubscribe from a subject (important for component cleanup)
-export function unsubscribeFrom(subject: string) {
+export function unsubscribeFrom(subject: string, handler: (msg: string) => void) {
   const sub = subscriptions.get(subject)
   if (sub) {
-    sub.unsubscribe()
-    subscriptions.delete(subject)
-    messagesBySubject.delete(subject) // Optional: clear messages on unsubscribe
+    const handlers = handlersBySubject.get(subject) // Optional: clear messages on unsubscribe
+    if (handlers) {
+      handlers.delete(handler)
+      if (handlers.size == 0) {
+        sub.unsubscribe()
+        subscriptions.delete(subject)
+        handlersBySubject.delete(subject)
+      }
+    }
   }
 }
-
-// Expose the messages map for components to use
-export { messagesBySubject }

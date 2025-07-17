@@ -47,7 +47,7 @@ end
 -- The main animation table to be returned
 local animation = {
 	name = "Animation 1",
-	fps = 60,
+	fps = 30,
 	duration_seconds = 5,
 	tracks = {}, -- An empty table to hold the tracks
 }

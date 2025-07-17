@@ -1,6 +1,8 @@
 package led
 
 import (
+	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"light-box/animation"
 	"light-box/natsserver"
@@ -131,6 +133,12 @@ func (s *SK9822) NumLEDs() int {
 	return s.numLEDs
 }
 
+type LedDebugState struct {
+	Index      int    `json:"index"`
+	Hex        string `json:"hex"`
+	Brightness int    `json:"brightness"`
+}
+
 func Loop(strip *SK9822, numLEDs int) {
 	// Infinite loop to blink the pixel.
 	prevAni := animation.AnimationPulse()
@@ -161,17 +169,21 @@ func Loop(strip *SK9822, numLEDs int) {
 					strip.SetPixel(j, r, g, b, br)
 				}
 
-				go natsserver.Manager.C.Publish(
-					"led-debug",
-					fmt.Appendf(nil,
-						"r: %d g: %d b: %d br: %d",
-						r,
-						g,
-						b,
-						br,
-					),
-				)
+				go func() {
+					bytes := []byte{r, g, b}
+					state := LedDebugState{
+						Index:      j,
+						Hex:        hex.EncodeToString(bytes),
+						Brightness: int(br),
+					}
 
+					b, _ := json.Marshal(state)
+
+					natsserver.Manager.C.Publish(
+						"led-debug",
+						b,
+					)
+				}()
 			}
 			if strip != nil {
 				if err := strip.Render(); err != nil {
